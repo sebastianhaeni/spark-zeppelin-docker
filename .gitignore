@@ -1,0 +1,19 @@
+# IDE & Editors
+.idea/
+.vscode/
+*.iml
+.metadata
+.settings/
+.project
+.classpath
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Container volume artifacts
+*.tgz
+spark/zeppelin/logs/
+spark/zeppelin/notebook/
+spark/zeppelin/conf/interpreter.json
+data/

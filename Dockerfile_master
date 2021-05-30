@@ -1,0 +1,12 @@
+FROM registry.local:5000/spark-zeppelin-demo/spark_base:latest
+
+ENV SPARK_MASTER_PORT 7077
+ENV SPARK_MASTER_WEBUI_PORT 8080
+ENV SPARK_MASTER_LOG /spark/logs
+
+COPY spark-master/conf/ /spark/conf
+
+EXPOSE 8080
+
+ENTRYPOINT $SPARK_HOME/bin/spark-class org.apache.spark.deploy.master.Master
+

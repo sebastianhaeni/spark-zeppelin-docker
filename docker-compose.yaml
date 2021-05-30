@@ -1,0 +1,57 @@
+version: "3"
+services:
+  proxy:
+    build: 
+      context: .
+      dockerfile: Dockerfile_proxy
+    image: registry.local:5000/spark-zeppelin-demo/proxy
+    restart: always
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+  spark-ui-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile_spark-ui-proxy
+    image: registry.local:5000/spark-zeppelin-demo/spark-ui-proxy:latest
+    restart: always
+    environment:
+      - "SPARK_MASTER_HOST=spark-master:8080"
+  spark-master:
+    build:
+      context: .
+      dockerfile: Dockerfile_master
+    image: registry.local:5000/spark-zeppelin-demo/spark-master:latest
+    restart: always
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+    volumes:
+      - "./data:/srv/data"
+  spark-worker-1:
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    image: registry.local:5000/spark-zeppelin-demo/spark-worker:latest
+    restart: always
+    depends_on:
+      - spark-master
+    volumes:
+      - "./data:/srv/data"
+    environment:
+      - "SPARK_MASTER=spark://spark-master:7077"
+  zeppelin:
+    build:
+      context: .
+      dockerfile: Dockerfile_zeppelin
+    image: registry.local:5000/spark-zeppelin-demo/zeppelin:latest
+    restart: always
+    depends_on:
+      - spark-master
+    volumes:
+      - "./zeppelin/conf:/zeppelin/conf"
+      - "./zeppelin/logs:/zeppelin/logs"
+      - "./zeppelin/notebook:/zeppelin/notebook"
+      - "./data:/srv/data"
+networks:
+  default:
